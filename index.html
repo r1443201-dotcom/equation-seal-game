@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#11182d">
+  <meta name="description" content="方程式封印怪：選擇難度、解開數學題目、解除怪物封印的互動網頁遊戲。">
+  <title>方程式封印怪｜數學解謎闖關</title>
+  <style>
+    :root { --bg:#101729; --bg2:#141f36; --card:#1b2943; --border:#3b4e69; --ink:#f4f6ff; --muted:#b3c1da; --pink:#ff859c; --purple:#aaa0ff; --mint:#80e6c5; --amber:#ffce72; --red:#ff938e; --shadow:0 22px 70px rgba(3,8,23,.4); }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin:0; min-height:100vh; font-family: "Microsoft JhengHei","Noto Sans TC",system-ui,-apple-system,sans-serif; color:var(--ink); background: radial-gradient(ellipse 660px 460px at 50% -30%,rgba(159,118,255,.24),transparent 90%), radial-gradient(ellipse 650px 600px at 100% 48%,rgba(49,202,184,.08),transparent 80%), linear-gradient(145deg,#0c1324,#17233b 70%,#0d1628); }
+    button, input { font:inherit; } button { cursor:pointer; } button:focus-visible, input:focus-visible, a:focus-visible { outline:3px solid var(--amber); outline-offset:4px; }
+    .shell { width:min(1170px,calc(100% - 40px)); margin:0 auto; padding:25px 0 50px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:20px; margin-bottom:33px; }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand-mark { width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#c0a4ff,#f38fb2);box-shadow:0 10px 30px #8b6dfc2b;color:#27304e; font-weight:1000; font-size:25px; transform:rotate(-5deg); }
+    .brand-title { font-weight:900;font-size:18px;letter-spacing:.04em; }
+    .brand-sub { margin-top:3px; color:var(--muted);font-size:11px;letter-spacing:.12em; }
+    .header-right { display:flex; align-items:center; gap:10px; }
+    .header-pill { border:1px solid #435370; color:#d2dcf1; background:#ffffff0a; border-radius:999px; padding:9px 15px; font-size:12px; font-weight:700; }
+    .header-pill strong { color:var(--amber); font-size:14px; }
+    .intro { text-align:center; margin:7px auto 26px; }
+    .eyebrow { font-size:12px; font-weight:900; letter-spacing:.23em; color:var(--mint); margin-bottom:8px; }
+    h1 { margin:0; font-size:clamp(30px,5vw,56px); letter-spacing:.035em; line-height:1.25; font-weight:1000; }
+    h1 span { background:linear-gradient(90deg,#ffc1ba,#c1a4ff 60%,#88e5cf);color:transparent;background-clip:text; }
+    .subtitle { color:var(--muted);margin:11px 0 0; font-size:15px; line-height:1.8; }
+    .main-grid { display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:22px;align-items:stretch; }
+    .arena { border:1px solid #58668e7d; border-radius:25px; background: radial-gradient(circle at 50% 37%,#424071 0%,#262f53 30%,#1b2946 73%,#192841 100%); min-height:560px; position:relative; box-shadow:var(--shadow); overflow:hidden; padding:23px 25px 26px; display:flex; flex-direction:column; }
+    .arena::before { content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(#ffffff29 1px,transparent 1px);background-size:32px 32px; opacity:.3; mask-image:linear-gradient(to bottom,#000,transparent 87%); }
+    .arena-top { position:relative;z-index:1; display:flex;align-items:center;justify-content:space-between;gap:10px; }
+    .stage { background:#10193191;border:1px solid #9f9fff55;padding:9px 13px;border-radius:999px;color:#dfdbff;font-size:12px;font-weight:900;letter-spacing:.05em; }
+    .difficulty-view { color:var(--amber);font-size:20px;letter-spacing:3px;text-shadow:0 3px 14px #ffd58166; }
+    .monster-zone { display:flex;flex-direction:column;justify-content:center;align-items:center;flex:1;min-height:260px;position:relative;z-index:1; }
+    .monster-glow { position:absolute;width:270px;height:270px;border-radius:50%;background:radial-gradient(circle,#aaa2ff4f,transparent 69%);top:5px;filter:blur(4px); }
+    .seal-ring { width:262px;height:262px;border:2px dashed #f3d1ff60;border-radius:50%;position:absolute;top:15px;box-shadow:0 0 45px #c9a6ff20, inset 0 0 30px #c9a6ff0c; animation:spin 32s linear infinite; }
+    .seal-ring::after, .seal-ring::before { content:"✦";position:absolute;color:#ffd88f;font-size:25px;top:-18px;left:110px; }
+    .seal-ring::after { top:235px;left:110px; }
+    @keyframes spin {to{transform:rotate(360deg)}}
+    .monster-wrap { position:relative;width:205px;height:220px; display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 20px 22px #090a295e);animation:float 3.2s ease-in-out infinite; }
+    @keyframes float {50%{transform:translateY(-9px)}}
+    .horn { position:absolute; width:47px;height:75px;border-radius:60% 55% 15% 10%;top:17px;background:#ffb1d1;z-index:0;border:5px solid #8f679c; }
+    .horn.left {left:21px;transform:rotate(-30deg)} .horn.right{right:21px;transform:rotate(30deg) scaleX(-1)}
+    .monster { position:relative; width:178px;height:167px;border-radius:48% 48% 38% 38%;z-index:1;margin-top:38px;background:linear-gradient(140deg,#ffd0e4,#ec9fc6);border:5px solid #bb83c6;box-shadow:inset -14px -15px 0 #db87b55e,inset 13px 9px 0 #fff8; }
+    .monster::after { content:""; position:absolute;top:22px;left:22px;width:53px;height:25px;border-radius:50%;background:#fff9;transform:rotate(-23deg); }
+    .eye { position:absolute;width:13px;height:24px;border-radius:50%;background:#33314b;top:69px;z-index:2; }.eye.left {left:42px}.eye.right {right:42px}
+    .cheek {position:absolute;width:28px;height:15px;border-radius:50%;background:#fa7fa3aa;top:96px;}.cheek.left{left:18px}.cheek.right{right:18px}
+    .mouth {position:absolute;top:98px;left:78px;width:20px;height:13px;border-bottom:4px solid #593f67;border-radius:0 0 50% 50%;}
+    .foot { position:absolute;width:44px;height:34px;bottom:0;background:#db83ab;border:5px solid #ad70af;border-radius:49%;z-index:0; }.foot.left {left:38px;transform:rotate(-18deg)}.foot.right {right:38px;transform:rotate(18deg)}
+    .monster-wrap[data-tone="mint"] .monster{background:linear-gradient(140deg,#bcffdf,#77d9bd);border-color:#58a9a3;box-shadow:inset -14px -15px 0 #4bb89a55,inset 13px 9px 0 #fff8}
+    .monster-wrap[data-tone="mint"] .horn{background:#9dedd7;border-color:#5eaaa6}.monster-wrap[data-tone="mint"] .foot{background:#63bea8;border-color:#58a9a3}
+    .monster-wrap[data-tone="amber"] .monster{background:linear-gradient(140deg,#ffe4a9,#ffbd83);border-color:#d69c75;box-shadow:inset -14px -15px 0 #e4a26855,inset 13px 9px 0 #fff8}
+    .monster-wrap[data-tone="amber"] .horn{background:#ffe5a9;border-color:#ce978b}.monster-wrap[data-tone="amber"] .foot{background:#efac73;border-color:#d69c75}
+    .monster-wrap.shake{animation:shake .33s ease-out;} @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
+    .monster-wrap.sparkle{animation:pop .5s ease;} @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.14)}100%{transform:scale(1)}}
+    .monster-name {position:relative;color:#fcecff;font-size:13px;font-weight:800;letter-spacing:.17em;margin-top:-1px; }
+    .equation-box { position:relative;z-index:1; text-align:center; background:#0c1732ad;border:1px solid #a1a5ef79;border-radius:18px;padding:15px 14px;box-shadow:inset 0 1px 0 #fff2; }
+    .eq-label { color:#bcbcff;font-size:10px;font-weight:900;letter-spacing:.16em;margin-bottom:7px; }
+    .equation { font-weight:950;font-size:clamp(27px,3.8vw,44px);letter-spacing:.02em;font-variant-numeric:tabular-nums; }
+    .equation.waiting {font-size:24px; color:#d7daff;letter-spacing:.03em;}
+    .arena-bottom {position:relative;z-index:1;display:flex;gap:11px;margin-top:15px;}
+    .arena-bottom .smalltag {font-size:11px; border:1px solid #697b9d7b; background:#09192b75;padding:8px 10px;border-radius:9px;color:#cbdaf0;}
+    .side { display:flex;flex-direction:column;gap:16px; }
+    .panel { background:linear-gradient(135deg,#20314f,#1b2841);border:1px solid #425572;border-radius:22px;box-shadow:var(--shadow);padding:23px; }
+    .panel h2 {font-size:16px;font-weight:900;margin:0 0 13px;display:flex;align-items:center;gap:8px;}
+    .panel p {font-size:13px;color:var(--muted);line-height:1.8;margin:0 0 10px;}
+    .level-list {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:17px 0; }
+    .level { color:#d7e1f4;background:#13213a;border:1px solid #3c4f6c;border-radius:12px;min-width:0;padding:13px 5px 10px; font-weight:800;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:.18s; }
+    .level .stars {color:var(--amber);font-size:16px;white-space:nowrap;letter-spacing:1px;}.level[aria-pressed="true"] {background:#524b90;border-color:#c7adff;box-shadow:0 0 0 2px #af9fff29;} .level:hover:not(:disabled){border-color:#a8adf1;transform:translateY(-2px)} .level:disabled{cursor:not-allowed;opacity:.78;}
+    .primary {background:linear-gradient(105deg,#ff9c9e,#c5a0ff);border:0;border-radius:13px;color:#232038;font-weight:950;min-height:49px;padding:12px 17px;box-shadow:0 8px 24px #b98cff25;transition:transform .15s,filter .15s;}
+    .primary:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.08)}.primary:disabled {opacity:.45;cursor:not-allowed;}
+    .wide {width:100%;}
+    .stats {display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0 0;}
+    .stat {border:1px solid #3d5070;background:#111e36c7;border-radius:13px;padding:12px;}
+    .stat-label {font-size:11px;color:#b2c1dd;}.stat-value {font-size:23px;font-weight:950;margin-top:4px;}.stat-value.lives{font-size:20px;letter-spacing:1px;color:#ff9fa6;}
+    .answer-area {margin-top:16px;display:grid;grid-template-columns:1fr auto;gap:9px;}
+    input {width:100%; min-width:0;border:1px solid #526884;background:#101b2f;color:var(--ink);border-radius:12px;padding:12px 13px;font-size:18px;font-weight:800;outline:none;}
+    input::placeholder{font-size:13px;color:#9fb0cc;font-weight:400;}input:focus{border-color:#c0a4ff;box-shadow:0 0 0 3px #b69bff28;}
+    .answer-area .primary {min-width:95px;}
+    .secondary {border:1px solid #64769a;background:#243756;color:#e5ebff;border-radius:12px;font-weight:750;padding:11px 15px;min-height:43px;}.secondary:hover:not(:disabled){background:#304665}.secondary:disabled{opacity:.4;cursor:not-allowed;}
+    .action-row{display:flex;gap:9px;margin-top:10px;}.action-row button{flex:1;}
+    .feedback { min-height:49px; display:flex;align-items:center; justify-content:center; text-align:center; font-size:12px;font-weight:750;color:var(--muted); line-height:1.6;margin:9px 0 -9px; padding:8px;border-radius:10px; }
+    .feedback.good {background:#2a645055;color:#96f5d2;}.feedback.bad {background:#8c404044;color:#ffb0aa;}.feedback.hint {background:#6e643544;color:#ffe1a0;}
+    .guide {display:grid;gap:10px;}
+    .guide-row {display:flex;gap:11px;align-items:flex-start;color:#bdcce2;font-size:12px;line-height:1.7;}.guide-num {background:#304b68;border:1px solid #5e7a9a;border-radius:8px;display:grid;place-items:center;width:25px;height:25px;flex:0 0 25px;color:#d6eeff;font-weight:900;}
+    .footer {text-align:center;color:#8293af;font-size:11px;line-height:1.7;margin-top:25px;}
+    .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:22px;background:#060c1ec9;backdrop-filter:blur(8px);z-index:10}.overlay.show{display:flex}
+    .result-card{width:min(420px,100%);background:linear-gradient(145deg,#263657,#1b2944);border:1px solid #8995c5;border-radius:25px;text-align:center;padding:38px 26px;box-shadow:0 25px 80px #0007;}
+    .result-icon{font-size:56px}.result-card h2{font-size:27px;margin:12px 0 9px}.result-card p{color:#bccbe1;font-size:14px;line-height:1.8}.final-score{font-weight:950;color:#ffd788;font-size:30px;margin:17px 0 20px;}
+    [hidden]{display:none!important}
+    @media (max-width:850px) { .main-grid{grid-template-columns:1fr;} .arena{min-height:510px} .side{display:grid;grid-template-columns:1fr 1fr;gap:14px}.side>.panel:first-child {grid-column:1/-1}.shell{width:min(740px,calc(100% - 28px));} }
+    @media (max-width:540px) { .shell{width:calc(100% - 24px);padding-top:16px;}header{margin-bottom:24px}.brand-title{font-size:15px}.brand-mark{height:39px;width:39px}.header-pill{padding:8px 11px;font-size:10px;} .header-right .header-pill:last-child{display:none}.intro{margin-bottom:20px}.subtitle{font-size:12px}.arena{min-height:455px;padding:16px 14px 17px;border-radius:20px}.monster-zone{min-height:240px}.monster-wrap{transform:scale(.9);height:190px;animation:none}.monster-glow{width:230px;height:230px}.seal-ring{width:235px;height:235px;top:1px}.seal-ring::after{top:211px}.equation{font-size:32px}.side{grid-template-columns:1fr;}.panel{padding:19px}.answer-area{grid-template-columns:1fr auto} .arena-bottom .smalltag{font-size:10px;padding:7px 8px}.monster-name{margin-top:5px} }
+    @media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important} }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand"><div class="brand-mark">✦</div><div><div class="brand-title">方程式封印怪</div><div class="brand-sub">EQUATION SEAL QUEST</div></div></div>
+      <div class="header-right"><div class="header-pill">🏆 最高分 <strong id="bestScore">0</strong></div><div class="header-pill">純前端 · 單一 HTML</div></div>
+    </header>
+    <section class="intro"><div class="eyebrow">✧ MATH ADVENTURE ✧</div><h1>解開方程式，<span>解除封印！</span></h1><p class="subtitle">怪物被數學封印困住了！選擇星級、輸入正確答案，挑戰連續 5 道關卡。</p></section>
+    <main class="main-grid">
+      <section class="arena" aria-label="怪物闖關區">
+        <div class="arena-top"><div class="stage" id="stageText">等待冒險開始</div><div class="difficulty-view" id="arenaStars" aria-label="難度一星">★☆☆</div></div>
+        <div class="monster-zone">
+          <div class="monster-glow" aria-hidden="true"></div><div class="seal-ring" aria-hidden="true"></div>
+          <div class="monster-wrap" id="monsterWrap" data-tone="pink" aria-label="可愛的封印怪">
+            <div class="horn left"></div><div class="horn right"></div><div class="foot left"></div><div class="foot right"></div>
+            <div class="monster"><div class="eye left"></div><div class="eye right"></div><div class="cheek left"></div><div class="cheek right"></div><div class="mouth"></div></div>
+          </div>
+          <div class="monster-name" id="monsterName">等待被解救的封印怪</div>
+        </div>
+        <div class="equation-box"><div class="eq-label" id="eqLabel">SEALED EQUATION</div><div class="equation waiting" id="equation">準備好開始你的數學冒險了嗎？</div></div>
+        <div class="arena-bottom"><div class="smalltag">✦ 答對即可解除一層封印</div><div class="smalltag">♡ 最多失誤 3 次</div></div>
+      </section>
+      <section class="side">
+        <div class="panel"><h2>🎮 冒險控制台</h2><p>先選擇怪物星級，再開始答題。每場挑戰有 5 道題，答對加分、答錯扣生命。</p>
+          <div class="level-list" role="group" aria-label="選擇難度">
+            <button type="button" class="level" data-level="1" aria-pressed="true"><span class="stars">★☆☆</span><span>初階</span></button>
+            <button type="button" class="level" data-level="2" aria-pressed="false"><span class="stars">★★☆</span><span>進階</span></button>
+            <button type="button" class="level" data-level="3" aria-pressed="false"><span class="stars">★★★</span><span>挑戰</span></button>
+          </div>
+          <button type="button" class="primary wide" id="startBtn">✨ 開始解除封印</button>
+          <div class="stats"><div class="stat"><div class="stat-label">目前分數</div><div class="stat-value" id="score">0</div></div><div class="stat"><div class="stat-label">剩餘生命</div><div class="stat-value lives" id="lives" aria-label="三顆愛心">♥ ♥ ♥</div></div><div class="stat"><div class="stat-label">連續答對</div><div class="stat-value" id="streak">0</div></div><div class="stat"><div class="stat-label">已解救怪物</div><div class="stat-value" id="cleared">0 / 5</div></div></div>
+          <form class="answer-area" id="answerForm"><label for="answerInput" class="visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);">輸入數字答案</label><input id="answerInput" inputmode="numeric" type="number" step="1" placeholder="輸入你的答案" disabled autocomplete="off" required><button type="submit" class="primary" id="submitBtn" disabled>解除！</button></form>
+          <div class="action-row"><button type="button" class="secondary" id="hintBtn" disabled>💡 提示（-20 分）</button><button type="button" class="secondary" id="resetBtn">↻ 重新開始</button></div>
+          <div class="feedback" id="feedback" role="status" aria-live="polite">選好難度後，點擊「開始解除封印」。</div>
+        </div>
+        <div class="panel"><h2>📖 難度說明</h2><div class="guide"><div class="guide-row"><div class="guide-num">1</div><div><strong style="color:#ffe09d">★☆☆ 初階</strong>：加減法，例如 8 + 5 = ?</div></div><div class="guide-row"><div class="guide-num">2</div><div><strong style="color:#ffe09d">★★☆ 進階</strong>：乘除法，例如 6 × 7 = ?</div></div><div class="guide-row"><div class="guide-num">3</div><div><strong style="color:#ffe09d">★★★ 挑戰</strong>：一元一次方程式，例如 3x + 5 = 20</div></div></div></div>
+      </section>
+    </main>
+    <div class="footer">方程式封印怪 · 課堂 Vibe Coding 作品 · 僅使用 HTML / CSS / JavaScript · 分數儲存在此瀏覽器</div>
+  </div>
+  <div class="overlay" id="resultOverlay" role="dialog" aria-modal="true" aria-labelledby="resultTitle"><div class="result-card"><div class="result-icon" id="resultIcon">🏆</div><h2 id="resultTitle">挑戰完成！</h2><p id="resultDescription">成功解除所有封印</p><div class="final-score" id="finalScore">500 分</div><button type="button" class="primary wide" id="playAgainBtn">再挑戰一次</button></div></div>
+  <script>
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const totalStages = 5;
+      const state = { level:1, playing:false, transitioning:false, stage:0, score:0, lives:3, streak:0, question:null, hintUsed:false, best:0 };
+      try { state.best = Math.max(0, Number(localStorage.getItem('seal-monster-best')) || 0); } catch (_) {}
+      $('bestScore').textContent = state.best;
+      const stars = {1:'★☆☆',2:'★★☆',3:'★★★'};
+      const rand = (min,max) => Math.floor(Math.random()*(max-min+1))+min;
+      const pick = list => list[rand(0,list.length-1)];
+      function makeQuestion(level) {
+        if (level === 1) {
+          const a = rand(5,18), b = rand(2,12);
+          const plus = Math.random() < .5;
+          return plus ? { text:`${a} + ${b} = ?`, answer:a+b, hint:`先算 ${a} 加上 ${b}。`, explanation:`${a} + ${b} = ${a+b}` } : { text:`${a+b} − ${b} = ?`, answer:a, hint:`想一想：${b} 加上多少等於 ${a+b}？`, explanation:`${a+b} − ${b} = ${a}` };
+        }
+        if (level === 2) {
+          const a=rand(2,9), b=rand(2,9);
+          return Math.random()<.5 ? {text:`${a} × ${b} = ?`,answer:a*b,hint:`把 ${a} 加 ${b} 次。`,explanation:`${a} × ${b} = ${a*b}`} : {text:`${a*b} ÷ ${a} = ?`,answer:b,hint:`想一想：${a} 乘多少等於 ${a*b}？`,explanation:`${a*b} ÷ ${a} = ${b}`};
+        }
+        const x=rand(2,12), a=rand(2,6), b=rand(2,14), style=rand(0,2);
+        if (style===0) return {text:`${a}x + ${b} = ${a*x+b}`,answer:x,hint:`先將等號兩側減去 ${b}，再除以 ${a}。`,explanation:`x = (${a*x+b} − ${b}) ÷ ${a} = ${x}`};
+        if (style===1) return {text:`${a}x − ${b} = ${a*x-b}`,answer:x,hint:`先將等號兩側加上 ${b}，再除以 ${a}。`,explanation:`x = (${a*x-b} + ${b}) ÷ ${a} = ${x}`};
+        return {text:`${a}(x + ${b}) = ${a*(x+b)}`,answer:x,hint:`先除以 ${a}，再減去 ${b}。`,explanation:`x = (${a*(x+b)} ÷ ${a}) − ${b} = ${x}`};
+      }
+      function feedback(text, type='') { const el=$('feedback');el.textContent=text;el.className='feedback'+(type?' '+type:''); }
+      function updateStats() { $('score').textContent=state.score; $('lives').textContent='♥ '.repeat(state.lives).trim() || '—'; $('lives').setAttribute('aria-label',`${state.lives} 顆愛心`);$('streak').textContent=state.streak;$('cleared').textContent=`${state.stage} / ${totalStages}`;$('bestScore').textContent=state.best; }
+      function updateDifficulty() { document.querySelectorAll('.level').forEach(btn=>btn.setAttribute('aria-pressed',String(Number(btn.dataset.level)===state.level))); $('arenaStars').textContent=stars[state.level]; $('arenaStars').setAttribute('aria-label',`難度${state.level}星`); }
+      function newQuestion() { $('startBtn').disabled=true;document.querySelectorAll('.level').forEach(b=>b.disabled=true);state.question=makeQuestion(state.level);state.hintUsed=false;state.transitioning=false;$('stageText').textContent=`關卡 ${state.stage+1} / ${totalStages}`;$('equation').textContent=state.question.text;$('equation').classList.remove('waiting');$('eqLabel').textContent=state.level===3?'SOLVE FOR x':'SOLVE THE SEAL';$('monsterName').textContent=pick(['棉花糖封印怪','星塵封印怪','泡泡封印怪','雲朵封印怪','果凍封印怪']);$('monsterWrap').dataset.tone=pick(['pink','mint','amber']);$('answerInput').value='';$('answerInput').disabled=false;$('submitBtn').disabled=false;$('hintBtn').disabled=false;feedback('輸入答案，幫怪物解除封印！'); $('answerInput').focus();updateStats(); }
+      function resetView(){$('startBtn').disabled=false;document.querySelectorAll('.level').forEach(b=>b.disabled=false);state.playing=false;state.transitioning=false;state.stage=0;state.score=0;state.lives=3;state.streak=0;state.question=null;state.hintUsed=false;$('stageText').textContent='等待冒險開始';$('equation').textContent='準備好開始你的數學冒險了嗎？';$('equation').classList.add('waiting');$('eqLabel').textContent='SEALED EQUATION';$('monsterName').textContent='等待被解救的封印怪';$('monsterWrap').dataset.tone='pink';$('answerInput').value='';$('answerInput').disabled=true;$('submitBtn').disabled=true;$('hintBtn').disabled=true;$('startBtn').textContent='✨ 開始解除封印';$('resultOverlay').classList.remove('show'); feedback('選好難度後，點擊「開始解除封印」。');updateStats(); }
+      function saveBest(){ if (state.score>state.best){state.best=state.score;try{localStorage.setItem('seal-monster-best',String(state.best));}catch(_){}} }
+      function endGame(win) { $('startBtn').disabled=false;document.querySelectorAll('.level').forEach(b=>b.disabled=false);state.playing=false;state.transitioning=true; $('answerInput').disabled=true;$('submitBtn').disabled=true;$('hintBtn').disabled=true;saveBest();updateStats();$('resultIcon').textContent=win?'🏆':'💔';$('resultTitle').textContent=win?'成功解除全部封印！':'封印還沒解開！';$('resultDescription').textContent=win?`你成功救出 ${totalStages} 隻怪物！太厲害了！`:`答錯太多次了，本次救出 ${state.stage} 隻怪物。再試一次！`;$('finalScore').textContent=`${state.score} 分`;$('resultOverlay').classList.add('show');$('playAgainBtn').focus(); }
+      document.querySelectorAll('.level').forEach(btn=>btn.addEventListener('click',()=>{if(state.playing) {feedback('正在闖關中！重新開始後才可切換難度。','hint');return;}state.level=Number(btn.dataset.level);updateDifficulty();feedback(`已選擇 ${stars[state.level]} 難度，準備好就開始！`);}));
+      $('startBtn').addEventListener('click',()=>{state.stage=0;state.score=0;state.lives=3;state.streak=0;state.playing=true;state.transitioning=false;$('resultOverlay').classList.remove('show');$('startBtn').textContent='冒險進行中…';newQuestion();});
+      $('resetBtn').addEventListener('click',resetView);
+      $('playAgainBtn').addEventListener('click',()=>{$('startBtn').click();});
+      $('hintBtn').addEventListener('click',()=>{if(!state.playing||!state.question||state.transitioning)return;state.hintUsed=true;$('hintBtn').disabled=true;feedback(`💡 ${state.question.hint}（答對時扣 20 分）`,'hint');});
+      $('answerForm').addEventListener('submit',e=>{e.preventDefault();if(!state.playing||!state.question||state.transitioning)return;const raw=$('answerInput').value.trim();if(raw===''||!Number.isInteger(Number(raw))) {feedback('請輸入一個整數答案。','bad');return;}const guess=Number(raw);if(guess===state.question.answer){state.transitioning=true;state.streak++;const points=Math.max(0,100+20*(state.streak-1)-(state.hintUsed?20:0));state.score+=points;state.stage++;saveBest();updateStats();feedback(`✅ 解封成功！${state.question.explanation}　+${points} 分`,'good');$('answerInput').disabled=true;$('submitBtn').disabled=true;$('hintBtn').disabled=true;const mon=$('monsterWrap');mon.classList.remove('sparkle');void mon.offsetWidth;mon.classList.add('sparkle');setTimeout(()=>{mon.classList.remove('sparkle');if(state.stage>=totalStages)endGame(true);else newQuestion();},850);}else{state.lives--;state.streak=0;updateStats();feedback(`❌ 還不對！再試一次。剩下 ${state.lives} 次機會。`,'bad');const mon=$('monsterWrap');mon.classList.remove('shake');void mon.offsetWidth;mon.classList.add('shake');$('answerInput').select();if(state.lives<=0){setTimeout(()=>endGame(false),650);state.transitioning=true;}}});
+      updateDifficulty();resetView();
+    })();
+  </script>
+</body>
+</html>
